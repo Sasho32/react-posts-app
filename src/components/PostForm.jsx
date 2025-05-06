@@ -1,14 +1,27 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import './PostForm.css';
 
 const MAX_BODY_LENGTH = 500;
 
-const PostForm = ({ onClose, onSubmit, apiUrl }) => {
+const PostForm = ({ onClose, apiUrl, allPosts, setAllPosts, setUserIds }) => {
     const [userId, setUserId] = useState('');
     const [title, setTitle] = useState('');
     const [body, setBody] = useState('');
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState(null);
+
+    const successHandler = newPost => {
+        const maxId = allPosts.length;
+        const finalPost = { ...newPost, id: maxId + 1 };
+
+        setAllPosts(prev => [...prev, finalPost]);
+        setUserIds(prev => {
+            const exists = prev.includes(finalPost.userId);
+            return exists
+                ? prev
+                : [...prev, finalPost.userId].sort((a, b) => a - b);
+        });
+    };
 
     const handleFormSubmit = async e => {
         e.preventDefault();
@@ -33,7 +46,7 @@ const PostForm = ({ onClose, onSubmit, apiUrl }) => {
             if (!res.ok) throw new Error(`Error: ${res.status}`);
             const result = await res.json();
 
-            onSubmit(result);
+            successHandler(result);
             onClose();
         } catch (err) {
             console.error(err);
