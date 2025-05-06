@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const useFetch = (url, params = {}) => {
+const useFetch = url => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -14,7 +14,7 @@ const useFetch = (url, params = {}) => {
             setError(null);
 
             try {
-                const res = await fetch(url, { ...params, signal });
+                const res = await fetch(url, { signal });
                 if (!res.ok)
                     throw new Error(`HTTP error! Status: ${res.status}`);
                 const data = await res.json();
